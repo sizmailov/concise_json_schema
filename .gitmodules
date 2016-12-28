@@ -1,0 +1,3 @@
+[submodule "external/console_style"]
+	path = external/console_style
+	url = git@github.com:sizmailov/console_style.git
