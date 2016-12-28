@@ -10,7 +10,7 @@ JSONRangeException::JSONRangeException(const Json& ref, size_t index)
                     std::to_string(ref.size())),
       violated_copy(ref) {}
 
-JSONParseException::JSONParseException(std::istream& in, const std::string& what)
-    : JsonException(what), pos(in.tellg()) {}
+JSONParseException::JSONParseException(const std::string& what)
+    : JsonException(what) {}
 
-JSONParseException::JSONParseException(std::istream& in, const char* what) : JsonException(what), pos(in.tellg()) {}
+JSONParseException::JSONParseException(const char* what) : JsonException(what){}

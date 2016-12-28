@@ -10,6 +10,53 @@ using namespace JSON;
 
 using estd::get;
 
+
+namespace {
+
+inline JSONParseException unexpected_eof() { return JSONParseException("unexpected EOF"); };
+inline JSONParseException unexpected_char(const char expected, char& got) {
+  return JSONParseException("expected `" + std::string(1, expected) + "`, got `" + std::string(1, got) + "`");
+};
+void expect_char(const char expected, char& got) {
+  if (expected != got) {
+    throw unexpected_char(expected, got);
+  }
+}
+bool read_non_space(std::istream& in, char& c, bool skip_comments = true) {
+  in.read(&c, 1);
+  while (in.good()) {
+    if (skip_comments && c == '/') {
+      in.read(&c, 1);
+      expect_char('*', c);
+      in.read(&c, 1);
+      while (in.good()) {
+        if (c == '*') {
+          if (in.peek() == '/') {
+            in.read(&c, 1);
+            break;
+          }
+        }
+        in.read(&c, 1);
+      }
+      in.read(&c, 1);
+    }
+    if (!isspace(c)) {
+      break;
+    }
+    in.read(&c, 1);
+  }
+  return in.good();
+}
+void throw_if_bad(std::istream& in) {
+  if (!in.good()) {
+    throw unexpected_eof();
+  }
+}
+void read_non_space_or_throw(std::istream& in, char& c, bool skip_comments = true) {
+  read_non_space(in, c, skip_comments);
+  throw_if_bad(in);
+}
+}
 Json::Json() {
   static_assert(sizeof(Variant) == sizeof(decltype(m_value)), "");
   static_assert(alignof(Variant) == alignof(decltype(m_value)), "");
@@ -175,36 +222,21 @@ void Json::readArray(std::istream& in) {
   char c;
   Json::Array value;
 
-  c = in.peek();
-  while (true) {
-    if (!isspace(in.peek())) {
-      break;
-    }
-    in.read(&c, 1);
-  }
+  read_non_space_or_throw(in,c);
 
-  if (in.peek() != ']') {
+  if (c != ']') {
     for (; in.good();) {
+      in.unget();
       value.resize(value.size() + 1);
       in >> value.back();
-      in.read(&c, 1);
-      while (in.good() && isspace(c)) {
-        in.read(&c, 1);
-      }
-
-      if (!in.good()) {
-        throw(JSONParseException(in, "Unexpected EOF"));
-      }
+      read_non_space_or_throw(in,c);
 
       if (c == ']') {
         break;
       }
-      if (c != ',') {
-        throw(JSONParseException(in, "Expected `,`"));
-      }
+      expect_char(',',c);
+      read_non_space_or_throw(in,c);
     }
-  } else {
-    in.read(&c, 1);
   }
 
   variant() = std::move(value);
@@ -214,7 +246,7 @@ void Json::readTrue(std::istream& in) {
   char data[3];
   in.read(data, 3);
   if (data[0] != 'r' || data[1] != 'u' || data[2] != 'e') {
-    throw(JSONParseException(in, "bad `true` keyword"));
+    throw JSONParseException("bad `true` keyword");
   }
 
   variant() = true;
@@ -224,7 +256,7 @@ void Json::readFalse(std::istream& in) {
   char data[4];
   in.read(data, 4);
   if (data[0] != 'a' || data[1] != 'l' || data[2] != 's' || data[3] != 'e') {
-    throw(JSONParseException(in, "bad `false` keyword"));
+    throw JSONParseException("bad `false` keyword");
   }
 
   variant() = false;
@@ -253,7 +285,7 @@ void Json::readNumber(std::istream& in, char c) {
   }
 
   if (dots > 1 || text.size() - (int)(text[0] == '-') - dots == 0) {
-    throw(JSONParseException(in, "Invalid number"));
+    throw JSONParseException("invalid number");
   }
 
   int i = in.peek();
@@ -273,7 +305,7 @@ void Json::readNumber(std::istream& in, char c) {
     }
 
     if (i < '0' || i > '9') {
-      throw(JSONParseException(in, "Invalid number"));
+      throw JSONParseException("invalid number");
     }
 
     do {
@@ -289,7 +321,7 @@ void Json::readNumber(std::istream& in, char c) {
     variant() = value;
   } else {
     if (text.size() > 1 && ((text[0] == '0') || (text[0] == '-' && text[1] == '0'))) {
-      throw(JSONParseException(in, "Invalid number"));
+      throw JSONParseException("invalid number");
     }
 
     int64_t value;
@@ -302,7 +334,7 @@ void Json::readNull(std::istream& in) {
   char data[3];
   in.read(data, 3);
   if (data[0] != 'u' || data[1] != 'l' || data[2] != 'l') {
-    throw(JSONParseException(in, "bad `null` keyword"));
+    throw JSONParseException("bad `null` keyword");
   }
 
   variant() = Nil{};
@@ -311,18 +343,12 @@ void Json::readNull(std::istream& in) {
 void Json::readObject(std::istream& in) {
   char c;
   Json::Object value;
-  in.read(&c, 1);
-  while (in.good() && isspace(c)) {
-    in.read(&c, 1);
-  }
+  read_non_space_or_throw(in,c);
 
   if (c != '}') {
     std::string name;
     for (; in.good();) {
-      if (c != '"') {
-        throw(JSONParseException(in, "Expected string"));
-      }
-
+      expect_char('"',c);
       name.clear();
       for (; in.good();) {
         in.read(&c, 1);
@@ -338,42 +364,17 @@ void Json::readObject(std::istream& in) {
         name += c;
       }
 
-      if (!in.good()) {
-        throw(JSONParseException(in, "Unexpected EOF"));
-      }
-
-      in.read(&c, 1);
-      while (in.good() && isspace(c)) {
-        in.read(&c, 1);
-      }
-      if (c != ':') {
-        throw(JSONParseException(in, "Expected `:`"));
-      }
+      read_non_space_or_throw(in,c);
+      expect_char(':',c);
 
       in >> value[name];
-      in.read(&c, 1);
-      while (in.good() && isspace(c)) {
-        in.read(&c, 1);
-      }
-
-      if (!in.good()) {
-        throw(JSONParseException(in, "Unexpected EOF"));
-      }
+      read_non_space_or_throw(in,c);
       if (c == '}') {
         break;
       }
 
-      if (c != ',') {
-        throw(JSONParseException(in, "Expected `,`"));
-      }
-      in.read(&c, 1);
-      while (in.good() && isspace(c)) {
-        in.read(&c, 1);
-      }
-
-      if (!in.good()) {
-        throw(JSONParseException(in, "Unexpected EOF"));
-      }
+      expect_char(',',c);
+      read_non_space_or_throw(in,c);
     }
   }
 
@@ -399,7 +400,7 @@ void Json::readString(std::istream& in) {
   }
 
   if (!in.good()) {
-    throw(JSONParseException(in, "Unexpected EOF"));
+    throw JSONParseException("unexpected EOF");
   }
 
   variant() = std::move(value);
@@ -407,13 +408,8 @@ void Json::readString(std::istream& in) {
 
 std::istream& JSON::operator>>(std::istream& in, Json& JSONValue) {
   char c;
-  in.read(&c, 1);
-  while (in.good() && isspace(c)) {
-    in.read(&c, 1);
-  }
-  if (!in.good()) {
-    throw JSONParseException(in, "Unexpected EOF");
-  }
+  read_non_space_or_throw(in,c);
+
   if (c == '[') {
     JSONValue.readArray(in);
   } else if (c == 't') {
@@ -429,7 +425,7 @@ std::istream& JSON::operator>>(std::istream& in, Json& JSONValue) {
   } else if (c == '"') {
     JSONValue.readString(in);
   } else {
-    throw(JSONParseException(in, "Unexpected char `" + std::string(1, c) + "`"));
+    throw JSONParseException("unexpected char `" + std::string(1, c) + "`");
   }
   return in;
 }

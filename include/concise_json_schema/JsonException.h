@@ -22,9 +22,8 @@ class JSONLogicException : public JsonException {
 
 class JSONParseException : public JsonException {
  public:
-  JSONParseException(std::istream& in, const std::string& what);
-  JSONParseException(std::istream& in, const char* what);
-  std::iostream::pos_type pos;
+  JSONParseException(const std::string& what);
+  JSONParseException(const char* what);
 };
 
 class JsonGetException : public JsonException {
