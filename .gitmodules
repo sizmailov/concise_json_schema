@@ -1,6 +1,6 @@
 [submodule "external/console_style"]
 	path = external/console_style
-	url = github.com:sizmailov/console_style.git
+	url = git@github.com:sizmailov/console_style.git
 [submodule "external/gtest"]
 	path = external/gtest
-	url = github.com:google/googletest.git
+	url = git@github.com:google/googletest.git
