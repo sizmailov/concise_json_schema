@@ -60,4 +60,10 @@ TEST_F(JsonTests, good_inputs){
   EXPECT_NO_THROW("\"str\""_json);
   EXPECT_NO_THROW("\"str with space\""_json);
   EXPECT_NO_THROW("\"   str begins with space\""_json);
+  EXPECT_NO_THROW("/*comment*/2"_json);
+  EXPECT_NO_THROW("/*comment*/[]"_json);
+  EXPECT_NO_THROW("/*comment*/[1,2,3]"_json);
+  EXPECT_NO_THROW("/*comment*/[1,/*comment2*/2,3]"_json);
+  EXPECT_NO_THROW("/*comment0*/ /*comment1*/[1,/*comment2*/2,3]"_json);
+  EXPECT_NO_THROW("/*comment0*//*consequent comment1*/[1,/*comment2*/2/*comment3*/,3]"_json);
 }

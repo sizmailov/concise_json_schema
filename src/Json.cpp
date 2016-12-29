@@ -409,7 +409,10 @@ void Json::readString(std::istream& in) {
 std::istream& JSON::operator>>(std::istream& in, Json& JSONValue) {
   char c;
   read_non_space_or_throw(in,c);
-
+  while (c== '/'){
+    in.unget();
+    read_non_space_or_throw(in,c);
+  }
   if (c == '[') {
     JSONValue.readArray(in);
   } else if (c == 't') {

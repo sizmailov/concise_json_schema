@@ -73,3 +73,11 @@ TEST_F(SchemaTests, good_inputs){
   EXPECT_NO_THROW( R"xxx({?"b":int=4})xxx"_schema);
 
 }
+
+TEST_F(SchemaTests, comments){
+  EXPECT_NO_THROW("/**/any"_schema);
+  EXPECT_NO_THROW("/*comment*/any"_schema);
+  EXPECT_NO_THROW("/*comment*/any"_schema);
+  EXPECT_NO_THROW("/*comment*//*comment 2*/any"_schema);
+  EXPECT_NO_THROW("/*comment*/ /*comment 2*//* comment 3*/any"_schema);
+}
