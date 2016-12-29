@@ -3,12 +3,11 @@
 using namespace JSON;
 
 JSONRangeException::JSONRangeException(const Json& ref, const std::string& key)
-    : JsonException("Json object has no key `" + key + "`"), violated_copy(ref) {}
+    : JsonException("Json object has no key `" + key + "`") {}
 
 JSONRangeException::JSONRangeException(const Json& ref, size_t index)
     : JsonException("index " + std::to_string(index) + " is out of range of Json array [0, .. , " +
-                    std::to_string(ref.size())),
-      violated_copy(ref) {}
+                    std::to_string(ref.size())) {}
 
 JSONParseException::JSONParseException(const std::string& what)
     : JsonException(what) {}
