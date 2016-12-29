@@ -140,6 +140,25 @@ bool operator<(const Json::Nil&, const Json::Nil&);
 
 std::string to_string(const Json& json);
 
+inline namespace io{
+template <class T, typename = void>
+struct JsonSerializer {
+    static void deserialize(const Json& json, T& t);
+    static Json serialize(const T& t);
+};
+
+template <typename T>
+void deserialize(const Json& json, T& t) {
+    static_assert(!std::is_const<T>::value, "Can't deserialize to const object!");
+    JsonSerializer<T>::deserialize(json, t);
+}
+
+template <typename T>
+Json serialize(const T& t) {
+    return JsonSerializer<T>::serialize(t);
+}
+}
+
 inline namespace literals{
 Json operator ""_json(const char*, size_t);
 }
