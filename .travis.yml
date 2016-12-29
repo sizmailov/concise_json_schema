@@ -22,18 +22,18 @@ matrix:
             - cmake-data
             - g++-5
       env: COMPILER=g++-5
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise
-            - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
-          packages:
-            - cmake
-            - cmake-data
-            - clang-3.9
-      env: COMPILER=clang++-3.9
+#    - compiler: clang
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#            - llvm-toolchain-precise
+#            - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
+#          packages:
+#            - cmake
+#            - cmake-data
+#            - clang-3.9
+#      env: COMPILER=clang++-3.9
 
 script:
   - mkdir build
