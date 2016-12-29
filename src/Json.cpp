@@ -498,7 +498,7 @@ std::ostream& JSON::operator<<(std::ostream& out, const Json& json) {
   } else if (json.is_string()) {
     out << '"' << json.get_string() << '"';
   } else {
-    throw JSONLogicException("Invalid type");
+    assert(false);
   }
 
   return out;
@@ -590,7 +590,7 @@ void Json::pretty_print(std::ostream& out, int tab_size, int offset, bool first_
   } else if (is_string()) {
     out << cs::bright() << cs::green() << '"' << get_string() << '"';
   } else {
-    throw JSONLogicException("Invalid type");
+    assert(false);
   }
 }
 
