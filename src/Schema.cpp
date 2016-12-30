@@ -277,7 +277,7 @@ void SchemaMatchResult::MatchError::pretty_wordy_print(std::ostream& out, int ta
       queue.emplace_back(level + 1, &x);
     }
   }
-  pretty_print(*json, std::cout, tab_size, offset, true, comments);
+  pretty_print(*json, out, tab_size, offset, true, comments);
 }
 
 SchemaMatchResult Schema::AllOfSchema::match(const Json& json) const {
@@ -838,7 +838,7 @@ void Schema::ObjectSchema::pretty_print(std::ostream& out, int tab_size, int off
       std::get<0>(it->second).pretty_print(out, tab_size, offset + tab_size + maxLength + ololo, false);
       if (std::get<1>(it->second)) {
         out << " = ";
-        std::cout << cs::underline() << std::get<1>(it->second).value();
+        out << cs::underline() << std::get<1>(it->second).value();
       }
       ++it;
     }
@@ -853,7 +853,7 @@ void Schema::ObjectSchema::pretty_print(std::ostream& out, int tab_size, int off
       std::get<0>(it->second).pretty_print(out, tab_size, offset + tab_size + maxLength + ololo, false);
       if (std::get<1>(it->second)) {
         out << " = ";
-        std::cout << cs::underline() << std::get<1>(it->second).value();
+        out << cs::underline() << std::get<1>(it->second).value();
       }
     }
   }
