@@ -1,0 +1,56 @@
+Schema               ::= (Def | DocComment | NotDocComment | Space)* SchemaBody
+NoLeadingSpaceSchema ::= (Def | DocComment | NotDocComment) Schema
+Def                  ::= '#' AliasName Space Schema Ignorable? '#'
+SchemaBody           ::= AllOf | Any | AnyOf | Array | Bool | Double | Enum | Int | Not | Null | Object | OneOf | Reference | Str  | Tuple
+                       
+AllOf                ::= 'allOf(' SchemaList ')' 
+Any                  ::= 'any' 
+AnyOf                ::= 'anyOf(' SchemaList ')'
+Array                ::= '[' Space? ('unique' Space)? NoLeadingSpaceSchema Ignorable? ']' SizeSpec?
+Bool                 ::= 'bool'
+Double               ::= 'double' ( '(' ( Ignorable? (NumberValue Ignorable)? '..' Ignorable? (NumberValue Ignorable)?)? ')')?
+Enum                 ::= 'enum(' JsonList ')'
+Int                  ::= 'int' ( '(' ( Ignorable? (IntegerValue Ignorable)? '..' Ignorable? (IntegerValue Ignorable)? )? ')' )?
+Null                 ::= 'null'
+Not                  ::= 'not(' Schema Ignorable? ')'
+Object               ::= 'extensible'? '{' SchemaProperyList '}'
+OneOf                ::= 'oneOf(' SchemaList ')'
+Reference            ::= 'extended'? '@' AliasName
+Str                  ::= 'str'  ( '(' Ignorable? String Ignorable? ')' )? SizeSpec?
+Tuple                ::= '(' SchemaList ')'
+                    
+MandatoryProperty    ::=      String Ignorable? ':' Schema Ignorable?
+PatternProperty      ::= 're' String Ignorable? ':' Schema Ignorable?
+OptionalProperty     ::= '?'  String Ignorable? ':' Schema Ignorable? ('=' Json Ignorable?)?
+                     
+SchemaPropery        ::= Ignorable? (MandatoryProperty | OptionalProperty | PatternProperty)
+SchemaProperyList    ::= SchemaPropery ( ',' SchemaPropery )*  
+SizeSpec             ::= '{' Ignorable? (NotNegInt Ignorable?)? ',' Ignorable? (PosInt Ignorable?)? '}'
+SchemaList           ::= Schema Ignorable? (',' Schema Ignorable?)*
+JsonList             ::= Json   Ignorable? (',' Json   Ignorable?)* 
+                     
+                     
+Json                 ::= Ignorable? JsonBody
+JsonBody             ::= String | 'null' | 'true' | 'false' | JsonObject | JsonArray | NumberValue
+JsonArray            ::= '[' ( Json Ignorable? ( ',' Json Ignorable? )* )? ']'
+JsonObject           ::= '{' ( JsonPair ( ',' JsonPair)* )? '}'
+JsonPair             ::= Ignorable? String Ignorable? ':' Json Ignorable?
+
+<?TOKENS?>
+
+Ignorable            ::= (Comment | Space)+
+Space                ::= ( #x0020 | #x0009 | #x000D | #x000A )+
+                     
+CommentContent       ::= ( [^*] | '*'+ [^*/] )* '*'*
+NotDocComment        ::= '/*' ([^*] CommentContent)? '*/'
+DocComment           ::= '/**'      CommentContent '*/'
+Comment              ::= '/*'       CommentContent '*/'
+
+IntegerValue            ::= '-'? NotNegInt 
+PosInt             ::= [1-9] [0-9]*
+NumberValue            ::= IntegerValue ('.' [0-9]*)? ([eE] [+-]? [0-9]+)?
+                   
+NotNegInt          ::= '0' | PosInt
+StringChar         ::= [^#x22] | '\"'
+String             ::= '"' StringChar* '"'
+AliasName          ::= [A-Za-z] [A-Za-z0-9_]*
