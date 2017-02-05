@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <type_traits>
+#include <cassert>
 #include <vector>
 #include "variant"
 #include <experimental/optional>
@@ -84,6 +85,22 @@ struct JsonSerializer<std::vector<T>> {
     }
   }
   static Json serialize(const std::vector<T>& v) {
+    Json json(Json::Array{});
+    for (auto& x : v) {
+      json.push_back(JSON::serialize(x));
+    }
+    return json;
+  }
+};
+
+template <typename T, size_t N>
+struct JsonSerializer<std::array<T,N>> {
+  static void deserialize(const Json& json, std::array<T,N>& v) {
+    for (size_t i=0;i<N;i++) {
+      JSON::deserialize(json[i], v[i]);
+    }
+  }
+  static Json serialize(const std::array<T,N>& v) {
     Json json(Json::Array{});
     for (auto& x : v) {
       json.push_back(JSON::serialize(x));
