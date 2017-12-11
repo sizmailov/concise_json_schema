@@ -141,7 +141,7 @@ bool operator<(const Json::Nil&, const Json::Nil&);
 std::string to_string(const Json& json);
 
 inline namespace io{
-template <class T, typename = void>
+template <class T, typename = void, typename=void>
 struct JsonSerializer {
     static void deserialize(const Json& json, T& t);
     static Json serialize(const T& t);
@@ -149,7 +149,7 @@ struct JsonSerializer {
 
 template <typename T>
 void deserialize(const Json& json, T& t) {
-    static_assert(!std::is_const<T>::value, "Can't deserialize to const object!");
+    static_assert(!std::is_const<std::remove_reference_t<T>>::value, "Can't deserialize to const object!");
     JsonSerializer<T>::deserialize(json, t);
 }
 

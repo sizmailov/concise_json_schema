@@ -92,6 +92,25 @@ struct JsonSerializer<std::vector<T>> {
   }
 };
 
+template <typename T, size_t N>
+struct JsonSerializer<std::array<T,N>> {
+  static void deserialize(const Json& json, std::array<T,N>& v) {
+    if (json.size()!=v.size()){
+      throw std::runtime_error("Json array size != " + std::to_string(v.size()));
+    }
+    for (int i=0;i<v.size();i++) {
+      JSON::deserialize(json[i], v[i]);
+    }
+  }
+  static Json serialize(const std::array<T,N>& v) {
+    Json json(Json::Array{});
+    for (auto& x : v) {
+      json.push_back(JSON::serialize(x));
+    }
+    return json;
+  }
+};
+
 template <typename T>
 struct JsonSerializer<std::deque<T>> {
   static void deserialize(const Json& json, std::deque<T>& v) {

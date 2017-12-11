@@ -1,4 +1,5 @@
 #include "concise_json_schema/JsonSerializerStd.h"
+#include <complex>
 
 using namespace JSON::io;
 
@@ -53,6 +54,16 @@ DOUBLE_SERIALIZATION(float);
 
 #undef DOUBLE_SERIALIZATION
 
+template<>
+void JsonSerializer<std::complex<double>>::deserialize(const Json& json, std::complex<double>& v) {
+  v = std::complex<double>(json[0].get_double(),json[1].get_double());
+}
+
+
+template<>
+Json JsonSerializer<std::complex<double>>::serialize(const std::complex<double>& t) {
+  return Json(Json::Array{Json(t.real()),Json(t.imag())});
+}
 
 template<>
 void JsonSerializer<std::string>::deserialize(const Json& json, std::string& v) {

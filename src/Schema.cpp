@@ -305,6 +305,7 @@ SchemaMatchResult Schema::AnyOfSchema::match(const Json& json) const {
   if (count == 0) {
     return std::move(result);
   }
+  return result;
 }
 SchemaMatchResult Schema::ArraySchema::match(const Json& json) const {
   if (!json.is_array()) {
@@ -1065,7 +1066,9 @@ void Schema::readArray(std::istream& in, std::vector<Schema*>& parents) {
   result.items_schema->readSchema(in, parents);
   read_non_space_or_throw(in, c);
   expect_char(']', c);
-  read_non_space(in, c);
+  if (!read_non_space(in, c)){
+    return;
+  }
   if (c == '{') {
     read_non_space_or_throw(in, c);
     if (c >= '0' && c <= '9') {
@@ -1123,7 +1126,9 @@ void Schema::readDouble(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = DoubleSchema{};
   DoubleSchema& result = estd::get<DoubleSchema>(m_schema);
   char c;
-  read_non_space(in, c);
+  if (!read_non_space(in, c)){
+    return;
+  }
 
   if (c == '(') {
     read_non_space_or_throw(in, c);
@@ -1207,7 +1212,9 @@ void Schema::readInt(std::istream& in, std::vector<Schema*>& parents) {
   IntSchema& result = estd::get<IntSchema>(m_schema);
 
   char c;
-  read_non_space(in, c);
+  if (!read_non_space(in, c)){
+    return;
+  }
 
   if (c == '(') {
     read_non_space_or_throw(in, c);
@@ -1338,7 +1345,9 @@ void Schema::readString(std::istream& in, std::vector<Schema*>& parents) {
   StringSchema& result = estd::get<StringSchema>(m_schema);
 
   char c;
-  read_non_space(in, c);
+  if (!read_non_space(in, c)){
+    return;
+  }
   if (c == '(') {
     result.pattern = std::make_shared<std::pair<std::string, std::regex>>();
     read_non_space_or_throw(in, c);
@@ -1364,7 +1373,9 @@ void Schema::readString(std::istream& in, std::vector<Schema*>& parents) {
       throw SchemaParseException("bad regex `" + result.pattern->first + "`");
     }
     expect_char(')', c);
-    read_non_space(in, c);
+    if (!read_non_space(in, c)){
+      return;
+    }
   }
 
   if (c == '{') {
@@ -1389,7 +1400,9 @@ void Schema::readString(std::istream& in, std::vector<Schema*>& parents) {
       }
       expect_char('}', c);
     }
-    read_non_space(in, c);
+    if (!read_non_space(in, c)){
+      return;
+    }
   }
   in.unget();
 }
