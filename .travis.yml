@@ -33,6 +33,7 @@ matrix:
         apt:
           packages:
             - g++-7
+            - gcovr
           sources:
             - ubuntu-toolchain-r-test
 
@@ -49,7 +50,7 @@ script:
   - make test
 
 after_success:
-  - if [ "$BUILD_TYPE" == "Coverage" ]; then
-      gcovr build --root=./ --delete --exclude='external/.*' --exclude='tests/.*' --xml -o coverage.xml
-    fi;
+  - if [ "$BUILD_TYPE" == "Coverage" ]; then \
+      gcovr build --root=./ --delete --exclude='external/.*' --exclude='test/.*' --xml -o coverage.xml; \
+    fi; \
     bash <(curl -s https://codecov.io/bash)
