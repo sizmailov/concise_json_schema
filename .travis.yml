@@ -11,6 +11,11 @@ before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
 
+
+branches:
+  only:
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+
 matrix:
   include:
     - env: COMPILER=clang++-5.0 BUILD_TYPE=Debug
