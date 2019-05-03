@@ -50,7 +50,4 @@ script:
   - make test
 
 after_success:
-  - if [ "$BUILD_TYPE" == "Coverage" ]; then \
-      gcovr build --root=./ --delete --exclude='external/.*' --exclude='test/.*' --xml -o coverage.xml; \
-    fi; \
-    bash <(curl -s https://codecov.io/bash)
+  - bash run_coverage.sh
