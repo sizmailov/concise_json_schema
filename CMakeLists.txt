@@ -5,6 +5,18 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+
+IF(${CMAKE_BUILD_TYPE} MATCHES "Coverage")
+    IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -g ")
+        message("USE COVERAGE PROFILE")
+    ENDIF()
+    message("DONT USE COVERAGE PROFILE")
+else()
+    message("DONT USE COVERAGE PROFILE")
+ENDIF()
+
 enable_testing()
 
 
