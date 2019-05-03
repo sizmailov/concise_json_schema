@@ -7,8 +7,7 @@
 #include <set>
 #include <type_traits>
 #include <vector>
-#include "variant"
-#include <experimental/optional>
+#include <optional>
 #include "JsonException.h"
 
 namespace JSON{
@@ -165,10 +164,10 @@ struct JsonSerializer<std::reference_wrapper<T>> {
 
 
 template <typename T>
-struct JsonSerializer<estd::optional<T>>{
-  static void deserialize(const Json& json, estd::optional<T>& v) {
+struct JsonSerializer<std::optional<T>>{
+  static void deserialize(const Json& json, std::optional<T>& v) {
     if (json.is_null()) {
-      v = estd::optional<T>{};
+      v = std::optional<T>{};
     } else {
       T t;
       v = std::move(t);
@@ -176,7 +175,7 @@ struct JsonSerializer<estd::optional<T>>{
       JSON::deserialize(json, v.value());
     }
   }
-  static Json serialize(const estd::optional<T>& v) {
+  static Json serialize(const std::optional<T>& v) {
     if (v) {
       return JSON::serialize(v.value());
     }
@@ -191,10 +190,10 @@ struct assignVariantExpanderHelper;
 
 template<size_t i, size_t N, typename... Args>
 struct assignVariantExpanderHelper<0, i, N, Args...> {
-  static void expand_json_to_variant(const Json& json, estd::variant<Args...>& t)
+  static void expand_json_to_variant(const Json& json, std::variant<Args...>& t)
   {
     try {
-      using U = std::decay_t<decltype(estd::get<i>(t))>;
+      using U = std::decay_t<decltype(std::get<i>(t))>;
       U value;
       JSON::deserialize(json, value);
       t = std::move(value);
@@ -207,7 +206,7 @@ struct assignVariantExpanderHelper<0, i, N, Args...> {
 
 template<size_t i, typename... Args>
 struct assignVariantExpanderHelper<0, i, i, Args...> {
-  static void expand_json_to_variant(const Json&, estd::variant<Args...>&)
+  static void expand_json_to_variant(const Json&, std::variant<Args...>&)
   {
     throw std::runtime_error("No variant matched");
   }
@@ -215,15 +214,15 @@ struct assignVariantExpanderHelper<0, i, i, Args...> {
 }
 
 template <typename... Args>
-struct JsonSerializer<estd::variant<Args...>> {
-  static const size_t size = estd::variant_size<estd::variant<Args...>>::value;
+struct JsonSerializer<std::variant<Args...>> {
+  static const size_t size = std::variant_size<std::variant<Args...>>::value;
 
-  static void deserialize(const Json& json, estd::variant<Args...>& t) {
+  static void deserialize(const Json& json, std::variant<Args...>& t) {
     detail::assignVariantExpanderHelper<0, 0, size, Args...>::expand_json_to_variant(json, t);
   }
-  static Json serialize(const estd::variant<Args...>& t) {
+  static Json serialize(const std::variant<Args...>& t) {
     Json json;
-    estd::visit([&json](auto&& arg) { json = JSON::serialize(arg); }, t);
+    std::visit([&json](auto&& arg) { json = JSON::serialize(arg); }, t);
     return json;
   }
 };

@@ -38,7 +38,7 @@ class SchemaMatchResult {
   MatchError get_error() &&;
 
  private:
-  estd::variant<MatchSuccess, MatchError> m_match;
+  std::variant<MatchSuccess, MatchError> m_match;
   friend class JsonSchema;
 };
 
@@ -289,8 +289,8 @@ class Schema {
     return *this;
   };
 
-  const ObjectSchema& get_object() const { return estd::get<ObjectSchema>(m_schema); }
-  ObjectSchema& get_object() { return estd::get<ObjectSchema>(m_schema); }
+  const ObjectSchema& get_object() const { return std::get<ObjectSchema>(m_schema); }
+  ObjectSchema& get_object() { return std::get<ObjectSchema>(m_schema); }
 
   Schema& prepend_docstring(std::string s) {
     m_docstrings.push_back(std::move(s));
@@ -298,7 +298,7 @@ class Schema {
   }
 
  private:
-  estd::variant<
+  std::variant<
           AllOfSchema,
           AnySchema,
           AnyOfSchema,

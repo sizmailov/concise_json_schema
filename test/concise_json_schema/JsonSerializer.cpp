@@ -66,14 +66,14 @@ TEST_F(JsonSerializerTests, round_trip){
     JSON_ROUND_TRIP( value );
   }
   {
-    estd::variant<std::string,int> value;
+    std::variant<std::string,int> value;
     value = "string"s;
     JSON_ROUND_TRIP( value );
     value = 1;
     JSON_ROUND_TRIP( value );
   }
   {
-    estd::optional<std::string> value;
+    std::optional<std::string> value;
     JSON_ROUND_TRIP( value );
     value = "string"s;
     JSON_ROUND_TRIP( value );
