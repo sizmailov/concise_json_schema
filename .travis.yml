@@ -45,9 +45,8 @@ matrix:
 
 script:
   - mkdir build
-  - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && make
-  - make test
+  - ( cd build && cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && make )
+  - ( cd build && make test )
 
 after_success:
   - bash run_coverage.sh
