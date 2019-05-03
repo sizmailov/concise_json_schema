@@ -30,7 +30,7 @@ matrix:
             - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
               key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
-    - env: COMPILER=clang++-5.0 BUILD_TYPE=Release GSL_CXX_STANDARD=14
+    - env: COMPILER=clang++-5.0 BUILD_TYPE=Release
       addons: *clang50
 
     - env: COMPILER=g++-7 BUILD_TYPE=Debug
