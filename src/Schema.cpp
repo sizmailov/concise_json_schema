@@ -240,21 +240,21 @@ const SchemaMatchResult::MatchError& SchemaMatchResult::get_error() const& {
   if (m_match.index() == 0) {
     throw std::runtime_error("SchemaMatchResult: no match error");
   }
-  return estd::get<MatchError>(m_match);
+  return std::get<MatchError>(m_match);
 }
 
 SchemaMatchResult::MatchError& SchemaMatchResult::get_error()& {
   if (m_match.index() == 0) {
     throw std::runtime_error("SchemaMatchResult: no match error");
   }
-  return estd::get<MatchError>(m_match);
+  return std::get<MatchError>(m_match);
 }
 
 SchemaMatchResult::MatchError SchemaMatchResult::get_error()&& {
   if (m_match.index() == 0) {
     throw std::runtime_error("SchemaMatchResult: no match error");
   }
-  return estd::get<MatchError>(std::move(m_match));
+  return std::get<MatchError>(std::move(m_match));
 }
 
 SchemaMatchResult::MatchError::MatchError(const Json& json, const std::string& what)
@@ -457,7 +457,7 @@ SchemaMatchResult Schema::ReferenceSchema::match(const Json& json) const {
     throw std::runtime_error("bad reference");
   }
 
-  return estd::visit(reference_visiter{is_extended, json}, ref->m_schema);
+  return std::visit(reference_visiter{is_extended, json}, ref->m_schema);
 }
 SchemaMatchResult Schema::StringSchema::match(const Json& json) const {
   if (!json.is_string()) {
@@ -496,7 +496,7 @@ SchemaMatchResult Schema::TupleSchema::match(const Json& json) const {
   return SchemaMatchResult();
 }
 SchemaMatchResult Schema::match(const Json& json) const {
-  SchemaMatchResult result = estd::visit([&json](auto&& v) { return v.match(json); }, m_schema);
+  SchemaMatchResult result = std::visit([&json](auto&& v) { return v.match(json); }, m_schema);
   if (!result) {
     result.get_error().schema = this;
   }
@@ -659,7 +659,7 @@ Json Schema::TupleSchema::asJsonSchema() const {
 }
 
 Json Schema::asJsonSchema() const {
-  Json json = estd::visit([](auto&& v) { return v.asJsonSchema(); }, m_schema);
+  Json json = std::visit([](auto&& v) { return v.asJsonSchema(); }, m_schema);
   assert(json.is_object());
   if (!m_docstrings.empty()) {
     Json& s = json("description") = Json(Json::String(m_docstrings[0]));
@@ -1024,7 +1024,7 @@ const Schema* Schema::resolveReference(const std::string& name, const std::vecto
 
 void Schema::readAllOf(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = AllOfSchema{};
-  auto& result = estd::get<AllOfSchema>(m_schema);
+  auto& result = std::get<AllOfSchema>(m_schema);
 
   char c;
   read_non_space_or_throw(in, c);
@@ -1034,7 +1034,7 @@ void Schema::readAllOf(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readAnyOf(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = AnyOfSchema{};
-  AnyOfSchema& result = estd::get<AnyOfSchema>(m_schema);
+  AnyOfSchema& result = std::get<AnyOfSchema>(m_schema);
 
   char c;
   read_non_space_or_throw(in, c);
@@ -1043,7 +1043,7 @@ void Schema::readAnyOf(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readArray(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = ArraySchema{};
-  ArraySchema& result = estd::get<ArraySchema>(m_schema);
+  ArraySchema& result = std::get<ArraySchema>(m_schema);
 
   char c;
   read_non_space_or_throw(in, c);
@@ -1124,7 +1124,7 @@ void Schema::readDefinition(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readDouble(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = DoubleSchema{};
-  DoubleSchema& result = estd::get<DoubleSchema>(m_schema);
+  DoubleSchema& result = std::get<DoubleSchema>(m_schema);
   char c;
   if (!read_non_space(in, c)){
     return;
@@ -1170,7 +1170,7 @@ void Schema::readDouble(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readEnum(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = EnumSchema{};
-  EnumSchema& result = estd::get<EnumSchema>(m_schema);
+  EnumSchema& result = std::get<EnumSchema>(m_schema);
 
   char c;
   read_non_space_or_throw(in, c);
@@ -1195,7 +1195,7 @@ void Schema::readEnum(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readNot(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = NotSchema{};
-  auto& result = estd::get<NotSchema>(m_schema);
+  auto& result = std::get<NotSchema>(m_schema);
 
   char c;
   read_non_space_or_throw(in, c);
@@ -1209,7 +1209,7 @@ void Schema::readNot(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readInt(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = IntSchema{};
-  IntSchema& result = estd::get<IntSchema>(m_schema);
+  IntSchema& result = std::get<IntSchema>(m_schema);
 
   char c;
   if (!read_non_space(in, c)){
@@ -1246,7 +1246,7 @@ void Schema::readInt(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readOneOf(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = OneOfSchema{};
-  OneOfSchema& result = estd::get<OneOfSchema>(m_schema);
+  OneOfSchema& result = std::get<OneOfSchema>(m_schema);
 
   char c;
   read_non_space_or_throw(in, c);
@@ -1255,7 +1255,7 @@ void Schema::readOneOf(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readObject(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = ObjectSchema{};
-  ObjectSchema& result = estd::get<ObjectSchema>(m_schema);
+  ObjectSchema& result = std::get<ObjectSchema>(m_schema);
 
   char c;
   read_non_space_or_throw(in, c);
@@ -1323,7 +1323,7 @@ void Schema::readObject(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readReference(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = ReferenceSchema{};
-  ReferenceSchema& result = estd::get<ReferenceSchema>(m_schema);
+  ReferenceSchema& result = std::get<ReferenceSchema>(m_schema);
 
   char c;
   in.read(&c, 1);
@@ -1342,7 +1342,7 @@ void Schema::readReference(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readString(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = StringSchema{};
-  StringSchema& result = estd::get<StringSchema>(m_schema);
+  StringSchema& result = std::get<StringSchema>(m_schema);
 
   char c;
   if (!read_non_space(in, c)){
@@ -1408,7 +1408,7 @@ void Schema::readString(std::istream& in, std::vector<Schema*>& parents) {
 }
 void Schema::readTuple(std::istream& in, std::vector<Schema*>& parents) {
   m_schema = TupleSchema{};
-  TupleSchema& result = estd::get<TupleSchema>(m_schema);
+  TupleSchema& result = std::get<TupleSchema>(m_schema);
   readCSV(in, result.items, parents);
 }
 void Schema::readCSV(std::istream& in, std::vector<Schema>& values, std::vector<Schema*>& parents) {
@@ -1492,12 +1492,12 @@ void Schema::readSchema(std::istream& in, std::vector<Schema*>& parents) {
       read_non_space_or_throw(in, c);
       expect_char('{', c);
       readObject(in, parents);
-      estd::get<ObjectSchema>(m_schema).is_extensible = true;
+      std::get<ObjectSchema>(m_schema).is_extensible = true;
     } else if (word == "extended") {
       read_non_space_or_throw(in, c);
       expect_char('@', c);
       readReference(in, parents);
-      estd::get<ReferenceSchema>(m_schema).is_extended = true;
+      std::get<ReferenceSchema>(m_schema).is_extended = true;
     } else if (word == "oneOf") {
       readOneOf(in, parents);
     } else if (word == "str") {

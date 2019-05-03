@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1.3)
 project(concise_json_schema)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -11,7 +11,6 @@ enable_testing()
 
 add_subdirectory(external/console_style)
 include_directories(${console_style_INCLUDE_DIRS})
-include_directories(external/experimental_variant)
 
 add_subdirectory(external/gtest)
 include_directories(external/gtest/googletest/include)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "variant"
+#include <variant>
 
 #include <cstdint>
 #include <iostream>
@@ -10,8 +10,6 @@
 
 
 namespace JSON {
-
-namespace estd = std::experimental;
 
 class Json;
 
@@ -27,7 +25,7 @@ class Json {
   using Object = std::map<std::string, Json>;
   using Double = double;
   using String = std::string;
-  using Variant = estd::variant<Array, Boolean, Integer, Nil, Object, Double, String>;
+  using Variant = std::variant<Array, Boolean, Integer, Nil, Object, Double, String>;
 
   Json();
   Json(Json&& other);
@@ -111,14 +109,14 @@ class Json {
   static_assert(alignof(ObjectMimic) == alignof(Object), "");
 
   std::aligned_union_t<0,
-                       std::experimental::variant<Array,        // 0
-                                                  Boolean,      // 1
-                                                  Integer,      // 2
-                                                  Nil,          // 3
-                                                  ObjectMimic,  // 4
-                                                  Double,       // 5
-                                                  String        // 6
-                                                  >>
+                       std::variant<Array,        // 0
+                                    Boolean,      // 1
+                                    Integer,      // 2
+                                    Nil,          // 3
+                                    ObjectMimic,  // 4
+                                    Double,       // 5
+                                    String        // 6
+                                    >>
       m_value;
 
   void constructVariant();

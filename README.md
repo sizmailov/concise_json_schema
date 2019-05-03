@@ -1,12 +1,12 @@
 # concise_json_schema
 
-master: [![Build Status](https://travis-ci.org/sizmailov/concise_json_schema.svg?branch=master)](https://travis-ci.org/sizmailov/concise_json_schema)
+master: [![Build Status](https://travis-ci.com/sizmailov/concise_json_schema.svg?branch=master)](https://travis-ci.com/sizmailov/concise_json_schema)
 
 
 Introduction 
----- 
+------------
 
-Schema has 15 basic types, it allows defines and object's property defaults.
+Schema has 15 basic types and allows to define user types (see #define section).
 
 | Type name     | Schema Example|  JSON example    | 
 | ------------- |:-------------| :-----|
@@ -29,7 +29,7 @@ Schema has 15 basic types, it allows defines and object's property defaults.
 
 
 Comparison with JSON Schema
-----
+---------------------------
 
 Note: JSON Schema `{"items" : {"type":"integer"}}` matches JSON objects `1` or `null`, so field `"type" : "array"` is 
 required to constrain type. 
@@ -198,6 +198,61 @@ Multiline examples
 ```
 
 
+What is matched 
+---------------
+
+ 
+
+### **allOf**     
+
+
+**Match criteria:**  JSON value matches all sub-schemas. 
+
+**Note:** Match procedure goes from first sub-schema to last one. Order may matter 
+if sub-schemas perform default value substitution, see "Defaults substitution" section for further details
+
+**Examples:**
+
+```
+  allOf(int,enum(2,3,5,7,11)) /* dummy example */
+  
+  allOf(extensible { "x" : int(1..)}, 
+        extensible { "y" : int(1..)}
+       )
+  
+  allOf({?"x" : int = 2 },
+        { "x" : int(1..) }
+       ) /* matches {} and {"x": 1} */
+       
+       
+  allOf({ "x" : int(1..), 
+        {?"x" : int = 2 }}
+       ) /* matches {"x": 1}, but not {} */
+```
+
+### **any**
+
+**Match criteria:**  JSON value always matches. 
+
+
+### **anyOf**     
+
+**Match criteria:** JSON value matches at least one sub-schema. 
+
+**Note:** Match procedure is short-circuit and goes from first sub-schema to last one. Order may matter 
+if sub-schemas perform default value substitution, see "Defaults substitution" section for further details. 
+
+
+C++ Examples
+------------
+
+to be done 
+
+```c++
+
+```
+
+
 Known issues
------ 
-* (unfixable) schemas with default argument(s): altering validated JSON
+------------
+* schemas with default arguments alters validated JSON during check
