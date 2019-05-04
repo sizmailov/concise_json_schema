@@ -56,6 +56,21 @@ public:
       {R"((int,int,str))"_schema, R"([1,2,"s"])"_json, true},
       {R"(not(null))"_schema, R"([])"_json, true},
       {R"(not(anyOf(bool,null)))"_schema, R"(12345)"_json, true},
+      {R"(/**/any)"_schema, R"(null)"_json, true},
+      {R"(/***/any)"_schema, R"(null)"_json, true},
+      {R"(/** **/any)"_schema, R"(null)"_json, true},
+      {R"(/* **/any)"_schema, R"(null)"_json, true},
+      {R"(
+#opt_int oneOf(int,null)#
+{
+  re".*": @opt_int
+}
+)"_schema, R"({
+  "a": null,
+  "b": 5,
+  "c": -42,
+  "d": null
+})"_json, true},
 
   };
 };
@@ -168,6 +183,14 @@ TEST_F(SchemaTests, round_trip){
       Schema schema2;
       ss >> schema2;
       ASSERT_EQ(json_schema, schema2.asJsonSchema());
+    }
+    {
+      std::stringstream ss;
+      auto m = schema.match(json);
+      ss << m;
+      if (!m){
+        m.get_error().pretty_wordy_print(ss);
+      }
     }
   }
 }
