@@ -7,9 +7,9 @@ fi;
 
 if $CI
 then
-  gcovr build --root=./ --exclude='external/.*' --exclude='test/.*' --xml -o coverage.xml
+  gcovr build --root=./ --xml -o coverage.xml
   bash <(curl -s https://codecov.io/bash)
 else
-  gcovr cmake-build-coverage --root=./ --exclude='external/.*' --exclude='test/.*' --xml -o coverage.xml
+  gcovr cmake-build-coverage --root=./ --xml -o coverage.xml
   bash <(curl -s https://codecov.io/bash) -t @.cc_token
 fi
