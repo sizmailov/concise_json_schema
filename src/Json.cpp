@@ -58,19 +58,17 @@ void read_non_space_or_throw(std::istream& in, char& c, bool skip_comments = tru
 }
 }
 Json::Json() {
-  static_assert(sizeof(Variant) == sizeof(decltype(m_value)), "");
-  static_assert(alignof(Variant) == alignof(decltype(m_value)), "");
-  constructVariant();
+  static_assert(sizeof(Variant) == sizeof(decltype(m_value)));
+  static_assert(alignof(Variant) == alignof(decltype(m_value)));
+  new (m_value.__data) Variant(Nil{});
 }
 
-Json::Json(Json&& other) {
-  constructVariant();
-  variant() = std::move(other.variant());
+Json::Json(Json&& other) : Json{} {
+  new (m_value.__data) Variant(std::move(other.variant()));
 }
 
-Json::Json(const Json& other) {
-  constructVariant();
-  variant() = other.variant();
+Json::Json(const Json& other) : Json{} {
+  new (m_value.__data) Variant(other.variant());
 }
 
 Json::~Json() { reinterpret_cast<Variant*>(m_value.__data)->~Variant(); }
@@ -91,14 +89,28 @@ bool Json::is_number() const { return is_double() || is_integer(); }
 
 bool Json::is_string() const { return variant().index() == 6; }
 
-bool Json::get_bool() const {
+Json::Boolean Json::get_bool() const {
   if (!is_bool()) {
     throw JsonGetException("not a bool");
   }
   return get<Boolean>(variant());
 }
 
-int64_t Json::get_integer() const {
+Json::Boolean& Json::get_bool() {
+  if (!is_bool()) {
+    throw JsonGetException("not a bool");
+  }
+  return get<Boolean>(variant());
+}
+
+Json::Integer Json::get_integer() const {
+  if (!is_integer()) {
+    throw JsonGetException("not an integer");
+  }
+  return get<Integer>(variant());
+}
+
+Json::Integer& Json::get_integer() {
   if (!is_integer()) {
     throw JsonGetException("not an integer");
   }
@@ -119,14 +131,21 @@ Json::Object& Json::get_object() {
   return get<Object>(variant());
 }
 
-double Json::get_double() const {
+Json::Double Json::get_double() const {
   if (!is_double()) {
     throw JsonGetException("not a double");
   }
   return get<Double>(variant());
 }
 
-double Json::get_number() const {
+Json::Double& Json::get_double() {
+  if (!is_double()) {
+    throw JsonGetException("not a double");
+  }
+  return get<Double>(variant());
+}
+
+Json::Double Json::get_number() const {
   if (is_integer()) return get_integer();
   if (!is_double()) {
     throw JsonGetException("not a number");
@@ -134,14 +153,14 @@ double Json::get_number() const {
   return get<Double>(variant());
 }
 
-const std::string& Json::get_string() const {
+const Json::String& Json::get_string() const {
   if (!is_string()) {
     throw JsonGetException("not a string");
   }
   return get<String>(variant());
 }
 
-std::string& Json::get_string() {
+Json::String& Json::get_string() {
   if (!is_string()) {
     throw JsonGetException("not a string");
   }
@@ -214,7 +233,6 @@ Json::Array::const_iterator Json::end() const { return get_array().end(); }
 
 std::vector<Json>::iterator Json::end() { return get_array().end(); }
 
-void Json::constructVariant() { new (m_value.__data) Variant(Nil{}); }
 const Json::Variant& Json::variant() const { return *reinterpret_cast<const Variant*>(m_value.__data); }
 Json::Variant& Json::variant() { return *reinterpret_cast<Variant*>(m_value.__data); }
 
@@ -633,12 +651,17 @@ Json& Json::operator=(const Json::Array& value) {
   return *this;
 }
 
-Json& Json::operator=(bool value) {
+Json& Json::operator=(Json::Array&& value) {
+  variant() = std::move(value);
+  return *this;
+}
+
+Json& Json::operator=(Json::Boolean value) {
   variant() = value;
   return *this;
 }
 
-Json& Json::operator=(int64_t value) {
+Json& Json::operator=(Json::Integer value) {
   variant() = value;
   return *this;
 }
@@ -653,58 +676,74 @@ Json& Json::operator=(const Object& value) {
   return *this;
 }
 
-Json& Json::operator=(double value) {
+Json& Json::operator=(Object&& value) {
+  variant() = std::move(value);
+  return *this;
+}
+
+Json& Json::operator=(Json::Double value) {
   variant() = value;
   return *this;
 }
 
-Json& Json::operator=(const std::string& value) {
+Json& Json::operator=(const Json::String& value) {
   variant() = value;
   return *this;
 }
 
-Json& Json::operator=(const char* value) { return operator=(std::string(value)); }
+Json& Json::operator=(std::string&& value) {
+  variant() = std::move(value);
+  return *this;
+}
+
+
+Json& Json::operator=(const char* value) { return operator=(Json::String(value)); }
+
+Json::Json(const Json::Array& value) {
+  new (m_value.__data) Variant(std::move(value));
+}
 
 Json::Json(Json::Array&& value) {
-  constructVariant();
-  variant() = std::move(value);
+  new (m_value.__data) Variant(std::move(value));
 }
 
 Json::Json(bool value) {
-  constructVariant();
-  variant() = value;
+  new (m_value.__data) Variant(value);
 }
 
 Json::Json(int64_t value) {
-  constructVariant();
-  variant() = value;
+  new (m_value.__data) Variant(value);
 }
 
 Json::Json(int value) {
-  constructVariant();
-  variant() = Integer(value);
+  new (m_value.__data) Variant(Integer(value));
 }
 
-Json::Json(Json::Nil) { constructVariant(); }
+Json::Json(Json::Nil) : Json() {
+}
+
+Json::Json(const Json::Object& value) {
+  new (m_value.__data) Variant(value);
+}
 
 Json::Json(Json::Object&& value) {
-  constructVariant();
-  variant() = std::move(value);
+  new (m_value.__data) Variant(std::move(value));
 }
 
 Json::Json(double value) {
-  constructVariant();
-  variant() = value;
+  new (m_value.__data) Variant(value);
+}
+
+Json::Json(const Json::String& value) {
+  new (m_value.__data) Variant(value);
 }
 
 Json::Json(Json::String&& value) {
-  constructVariant();
-  variant() = std::move(value);
+  new (m_value.__data) Variant(std::move(value));
 }
 
 Json::Json(const char* value) {
-  constructVariant();
-  variant() = std::string(value);
+  new (m_value.__data) Variant(Json::String(value));
 }
 
 bool Json::operator!=(const Json& other) const { return variant() != other.variant(); }

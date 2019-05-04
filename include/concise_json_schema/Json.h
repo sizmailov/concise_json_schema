@@ -30,13 +30,16 @@ class Json {
   Json();
   Json(Json&& other);
   Json(const Json& other);
+  explicit Json(const Array& value);
   explicit Json(Array&& value);
   explicit Json(Boolean value);
   explicit Json(Integer value);
   explicit Json(int value);
   Json(Nil value);
+  explicit Json(const Object& value);
   explicit Json(Object&& value);
   explicit Json(Double value);
+  explicit Json(const String& value);
   explicit Json(String&& value);
   explicit Json(const char* value);
   ~Json();
@@ -45,12 +48,15 @@ class Json {
   Json& operator=(Json&& other);
 
   Json& operator=(const Array& value);
+  Json& operator=(Array&& value);
   Json& operator=(Boolean value);
   Json& operator=(Integer value);
   Json& operator=(Nil value);
   Json& operator=(const Object& value);
+  Json& operator=(Object&& value);
   Json& operator=(Double value);
   Json& operator=(const String& value);
+  Json& operator=(String&& value);
   Json& operator=(const char* value);
 
   bool operator==(const Json& other) const;
@@ -74,10 +80,14 @@ class Json {
   Double get_number() const;
   const String& get_string() const;
 
-  // no need in overloads for int/double/bool
   Array& get_array();
   Object& get_object();
   String& get_string();
+
+  Double& get_double();
+
+  Boolean& get_bool();
+  Integer& get_integer();
 
   const Json& operator()(const std::string& name) const;
   Json& operator()(const std::string& name);
@@ -119,7 +129,6 @@ class Json {
                                     >>
       m_value;
 
-  void constructVariant();
   const Variant& variant() const;
   Variant& variant();
 
