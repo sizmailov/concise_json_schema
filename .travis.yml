@@ -33,14 +33,20 @@ matrix:
         apt:
           packages:
             - g++-7
+            - gcovr
           sources:
             - ubuntu-toolchain-r-test
 
     - env: COMPILER=g++-7 BUILD_TYPE=Release
       addons: *gcc7
 
+    - env: COMPILER=g++-7 BUILD_TYPE=Coverage
+      addons: *gcc7
+
 script:
   - mkdir build
-  - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && make
-  - make test
+  - ( cd build && cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && make )
+  - ( cd build && make test )
+
+after_success:
+  - bash run_coverage.sh

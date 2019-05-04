@@ -1,6 +1,9 @@
 # concise_json_schema
 
-master: [![Build Status](https://travis-ci.com/sizmailov/concise_json_schema.svg?branch=master)](https://travis-ci.com/sizmailov/concise_json_schema)
+master: 
+[![Build Status](https://travis-ci.com/sizmailov/concise_json_schema.svg?branch=master)](https://travis-ci.com/sizmailov/concise_json_schema)
+[![Coverage]](https://codecov.io/gh/sizmailov/concise_json_schema/branch/master/graph/badge.svg)
+
 
 
 Introduction 
@@ -112,18 +115,18 @@ Inline examples
 | `{ ?"x" : int = 5}` |  `{ }` | true | defaulted property is not provided 
 | `{ ?"x" : int = 5}` |  `{"x":2 }` | true | defaulted property provided
 | `{ re"dbl_.+" : double}` |  `{"dbl_x": 2}` | true | pattern property provided
-| `{ "x":int, re".*":double}` |  `{"x": 2}` | false | pattern property mismatch
+| `{ "x":str, re".*":double}` |  `{"x": 2}` | false | pattern property mismatch
 | `{ }` |  `{"z":2 }` | false | unknown property
 | `str` |  `"foo"` | true| matches any string
 | `str{3}` |  `"bar"` | true| string of length 3
 | `str{,3}` |  `"bar"` | true| string of length 3 or less 
 | `str{3,}` |  `"bar"` | true| string of length 3 or more
 | `str{3,10}` |  `"foobar"` | true| string of length from 3 to 10
-| `str("[A-Z]")` |  `"FOO"` | true| string with regex constraint (matches whole string)  
+| `str("[A-Z]+")` |  `"FOO"` | true| string with regex constraint (matches whole string)  
 | `str("A")` |  `"AAA"` | false | regex does not match
 | `str("A*"){,5}` |  `"AAA"` | true | matches up to 5 "A"
 | `[any]` |  `[1,"s",{}]` | true | matches any array   
-| `[int]{1,5}` |  `[1,"s",{}]` | true | matches _int_ array of size 1 to 5   
+| `[int]{1,5}` |  `[1,"s",{}]` | false | matches _int_ array of size 1 to 5   
 | `[ unique int]{,5}` |  `[1,2,3]` | true | matches array of unique ints with size <=5   
 | `[ unique int]` |  `[1,2,3,4,1]` | false | matches array of unique ints    
 | `(int,int)` |  `[1,2]` | true | matches pair of ints   
