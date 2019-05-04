@@ -1662,7 +1662,6 @@ void JSON::Schema::write_to(std::ostream& out, const Schema::ObjectSchema& schem
       ++it;
     }
     for (; it != schema.pattern_properties.end(); ++it) {
-      out << ", ";
       out << ", re\"" << it->first.first << "\":";
       out << it->second;
     }
