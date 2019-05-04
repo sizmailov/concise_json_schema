@@ -1,6 +1,9 @@
 # concise_json_schema
 
-master: [![Build Status](https://travis-ci.com/sizmailov/concise_json_schema.svg?branch=master)](https://travis-ci.com/sizmailov/concise_json_schema)
+master: 
+[![Build Status](https://travis-ci.com/sizmailov/concise_json_schema.svg?branch=master)](https://travis-ci.com/sizmailov/concise_json_schema)
+[![Coverage]](https://codecov.io/gh/sizmailov/concise_json_schema/branch/master/graph/badge.svg)
+
 
 
 Introduction 
